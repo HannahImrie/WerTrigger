@@ -1,0 +1,31 @@
+name: Build Wertrigger
+
+on:
+  workflow_dispatch:       # manual trigger
+  push:
+    branches: [ main, master ]  # triggers on push to main/master
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # 1 Checkout the repo
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      # 2️ Setup MSBuild so it's on PATH
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+
+
+      # 4️ Build the solution in Release mode
+      - name: Build solution (Release)
+        run: msbuild <name>.sln /t:Rebuild /p:Configuration=Release /m /v:minimal
+
+      # 5️ Upload the compiled exe as an artifact
+      - name: Upload compiled exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: WerTrigger-exe
+          path: '**/bin/Release/**'
